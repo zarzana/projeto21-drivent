@@ -64,10 +64,6 @@ export function handleApplicationErrors(
     });
   }
 
-  if (err.name === 'TicketTypeNotFoundError') {
-    return res.sendStatus(httpStatus.BAD_REQUEST);
-  }
-
   /* eslint-disable-next-line no-console */
   console.error(err);
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
