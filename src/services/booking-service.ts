@@ -1,6 +1,5 @@
-import { ticketsService } from './tickets-service';
 import { forbiddenError, notFoundError } from '@/errors';
-import { bookingRepository, enrollmentRepository } from '@/repositories';
+import { bookingRepository, enrollmentRepository, ticketsRepository } from '@/repositories';
 
 async function getBookingByUserId(userId: number) {
   const booking = await bookingRepository.findBookingByUserId(userId);
@@ -25,7 +24,7 @@ async function postBooking(userId: number, roomId: number) {
   if (!enrollment) throw forbiddenError();
 
   // remaining errors 403 related to ticket status
-  const ticket = await ticketsService.getTicketByUserId(userId);
+  const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
   if (!ticket) throw forbiddenError();
   if (ticket.status !== 'PAID') throw forbiddenError();
   if (!ticket.TicketType.includesHotel) throw forbiddenError();

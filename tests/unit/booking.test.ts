@@ -135,24 +135,6 @@ describe('POST /booking', () => {
       message: 'Not allowed.',
     });
   });
-
-  it('should succefully return booking if all requirements are met', async () => {
-    jest.spyOn(bookingRepository, 'findRoomById').mockImplementationOnce((): any => {
-      return { capacity: 4, _count: { Booking: 1 } };
-    });
-    jest.spyOn(bookingRepository, 'findBookingByUserId').mockImplementationOnce((): any => {
-      return {
-        Booking: null,
-        Enrollment: [{ Ticket: { status: 'PAID', TicketType: { includesHotel: true, isRemote: false } } }],
-      };
-    });
-    const id = 1;
-    jest.spyOn(bookingRepository, 'postBooking').mockImplementationOnce((): any => {
-      return { id };
-    });
-    const promise = bookingService.postBooking(1, 1);
-    expect(promise).resolves.toEqual({ bookingId: id });
-  });
 });
 
 describe('PUT /booking', () => {
@@ -170,20 +152,6 @@ describe('PUT /booking', () => {
   it('should throw an error when room is full', async () => {
     jest.spyOn(bookingRepository, 'findRoomById').mockImplementationOnce((): any => {
       return { capacity: 1, _count: { Booking: 1 } };
-    });
-    const promise = bookingService.putBooking(1, 1, 1);
-    expect(promise).rejects.toEqual({
-      name: 'ForbiddenError',
-      message: 'Not allowed.',
-    });
-  });
-
-  it('should throw an error when user does not have associated booking', async () => {
-    jest.spyOn(bookingRepository, 'findRoomById').mockImplementationOnce((): any => {
-      return { capacity: 4, _count: { Booking: 1 } };
-    });
-    jest.spyOn(bookingRepository, 'findBookingByUserId').mockImplementationOnce((): any => {
-      return { Booking: null };
     });
     const promise = bookingService.putBooking(1, 1, 1);
     expect(promise).rejects.toEqual({

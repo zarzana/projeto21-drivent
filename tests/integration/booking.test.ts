@@ -256,17 +256,18 @@ describe('PUT /booking', () => {
       const enrollment = await createEnrollmentWithAddress(user);
       const ticketType = await createTicketType(false, true);
       await createTicket(enrollment.id, ticketType.id, 'PAID');
-      const room = await createRoom(1);
+      const room = await createRoom(1); // setting room capacity to 1 so that bookingUser cannot join room
       await createBooking(user.id, room.id);
 
       const bookingUser = await createUser();
       const bookingUserToken = await generateValidToken(bookingUser);
       const bookingUserEnrollment = await createEnrollmentWithAddress(bookingUser);
       await createTicket(bookingUserEnrollment.id, ticketType.id, 'PAID');
-      const booking2 = await createBooking(bookingUser.id, room.id);
+      const originalRoom = await createRoom(); // original room of second user
+      const booking = await createBooking(bookingUser.id, originalRoom.id);
 
       const { status } = await server
-        .put(`/booking/${booking2.id}`)
+        .put(`/booking/${booking.id}`)
         .set('Authorization', `Bearer ${bookingUserToken}`)
         .send({ roomId: room.id });
       expect(status).toBe(httpStatus.FORBIDDEN);
