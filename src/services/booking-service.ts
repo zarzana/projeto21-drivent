@@ -35,7 +35,24 @@ async function postBooking(userId: number, roomId: number) {
   return { bookingId: id };
 }
 
+async function putBooking(userId: number, roomId: number, bookingId: number) {
+  // error 404 if room doesn't exist
+  const room = await bookingRepository.findRoomById(roomId);
+  if (!room) throw notFoundError();
+
+  // error 403 if room is full
+  if (room.capacity === room._count.Booking) throw forbiddenError();
+
+  // error 403 if user has no booking
+  const booking = await bookingRepository.findBookingByUserId(userId);
+  if (!booking) throw forbiddenError();
+
+  const { id } = await bookingRepository.putBooking(bookingId, roomId);
+  return { bookingId: id };
+}
+
 export const bookingService = {
   getBookingByUserId,
   postBooking,
+  putBooking,
 };
